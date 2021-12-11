@@ -1,0 +1,19 @@
+.button-assignlevel, .button-assignsection {
+	margin-left: 5px;
+	height: 12px;
+	background-color: black;
+	color: cyan;	
+}
+#navigation-alt { 
+	position: sticky;
+	position: -webkit-sticky;
+	top: 0;
+	z-index: 9999;
+}
+#searchSchoolId {
+	width: 80px;	
+}
+
+.dropdown:hover>div>div>.dropdown-menu {
+  display: block;
+}

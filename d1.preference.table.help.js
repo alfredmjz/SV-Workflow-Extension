@@ -1,0 +1,30 @@
+(function(jq$) {
+    'use strict';
+    jq$('<div class="bootstrapiso">'
+			+'<strong>Custom Functions</strong>'
+			+'<p>Import from CSV - Add or replace preference table item(s) based on a CSV input file.</p>'
+			+'<ul>'
+				+'<li>File Format: <table border="1"><tr><td>Code</td><td>Label</td></tr></table></li>'
+				+'<li>Bulk creation of preference table items</li>'
+				+'<li>Synchronize preference table items with external source convertible to CSV</li>'
+			+'</ul>'
+			+'<div class="btn-group">'
+				+'<a class="btn btn-info text-white m-1 mt-1 disabled d1FileUploadBtn" id="d1AddPrefFromCsv" name="d1AddPrefFromCsv" '
+				+'title="Add to the existing preference table with the values contained in the import file" aria-disabled="true">'
+				+'Add from CSV</a>'
+				+'<a class="btn btn-info text-white m-1 mt-1 disabled d1FileUploadBtn" id="d1ReplacePrefFromCsv" name="d1ReplacePrefFromCsv" '
+				+'title="Replace the existing preference table with the values contained in the import file" aria-disabled="true">'
+				+'Replace from CSV</a>'
+			+'</div>'
+			+'<p>Export to CSV - Download CSV file with preference table item(s) in the order shown.</p>'
+			+'<ul>'
+				+'<li>Export file will contain code values in the first column and label values in the second column, if applicable</li>'
+			+'</ul>'
+			+'<div class="btn-group">'
+				+'<a class="btn btn-success text-white m-1 mt-1" id="d1ExportList" name="d1ExportList" '
+				+'title="Export the existing preference table" >'
+				+'Export to CSV </a>'			
+			+'</div>'
+    	+'</div>')
+    	.insertAfter("h1");
+})(jQuery);

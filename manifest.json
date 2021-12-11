@@ -1,0 +1,133 @@
+{
+  "manifest_version": 2,
+  "name": "SV Functions (D1)",
+  "short_name": "SVF",
+  "version": "0.89",
+   "browser_action": {
+   },
+  "icons": {
+   "16": "cloud_add_16.png",
+   "48": "cloud_add_48.png",
+   "128": "cloud_add_128.png"
+  },
+  "content_scripts": [
+  	{
+      "matches": ["https://*/srs/*"],
+      "js": ["d1.common.js"]
+    },
+  	{
+      "matches": ["https://*/srs/*"],
+      "css": ["d1.common.css","bootstrapiso.min.css"],
+      "js": ["jquery-2.2.4.min.js","bootstrap.bundle.min.js","d1.common.navigation.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/course/courseSectionInstructorProfile.do*"
+      ],
+      "js": ["d1.instructor.contract.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/specialtyprogram/placement/programOfferingPlacementDashboard.do*"
+      ],
+      "js": ["d1.placement.level.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/WebHelp*CSHID=2061*",
+        "https://*/srs/WebHelp*Curriculum%20Manager/Programs/Offerings/Offering%20Dashboard.htm*"
+      ],
+      "all_frames": true,
+      "css": ["d1.common.css","bootstrapiso.min.css"],
+      "js": ["jquery-2.2.4.min.js","d1.placement.level.help.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/course/courseSectionInstructorProfile.do*"
+      ],
+      "js": ["d1.instructor.contract.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/specialtyprogram/placement/sectionPlacementDashboardElective.do*"
+      ],
+      "js": ["d1.placement.section.elective.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/specialtyprogram/placement/sectionPlacementDashboard.do*"
+      ],
+      "js": ["d1.placement.section.level.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/specialtyprogram/placement/sectionPlacementDashboardRequired.do*"
+      ],
+      "js": ["d1.placement.section.js"]
+    },
+    {
+      "matches": [
+      	"https://*/srs/WebHelp*CSHID=2062*",
+      	"https://*/srs/WebHelp*Curriculum%20Manager/Programs/Offerings/Offering%20Placement%20by%20Subjects%20&%20Levels.htm*"
+      ],
+      "all_frames": true,
+      "css": ["d1.common.css","bootstrapiso.min.css"],
+      "js": ["jquery-2.2.4.min.js","d1.placement.section.help.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/enrolmgr/student/applications/applicationInstance.do?method=editPageInstance*"
+      ],
+      "js": ["d1.application.proficiency.js"]
+    },
+    {
+      "matches": [
+      	"https://*/srs/WebHelp*CSHID=365*",
+      	"https://*/srs/WebHelp*Enrollment%20Manager/Applications/Process%20Application.htm*"
+      ],
+      "all_frames": true,
+      "css": ["d1.common.css","bootstrapiso.min.css"],
+      "js": ["jquery-2.2.4.min.js","d1.application.proficiency.help.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/sysadmin/system/dynamicList.do*"
+      ],
+      "js": ["d1.preference.table.js","jquery.csv.js"]
+    },
+    {
+      "matches": [
+      	"https://*/srs/WebHelp*CSHID=293*",
+      	"https://*/srs/WebHelp*Content%2FSystem%2520Administration%2FSystem%2FPreference%2520Tables.htm*"
+      ],
+      "all_frames": true,
+      "css": ["d1.common.css","bootstrapiso.min.css"],
+      "js": ["jquery-2.2.4.min.js","d1.preference.table.help.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/semester/academicTerm*"
+      ],
+      "js": ["d1.calendar.term.js","jquery.csv.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/location/room.do*"
+      ],
+      "js": ["d1.location.room.js","jquery.csv.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/currmgr/course/customGradingSheet.do*"
+      ],
+      "js": ["d1.section.gradesheet.js"]
+    },
+    {
+      "matches": [
+        "https://*/srs/enrolmgr/common/course/academicHistory.do*"
+      ],
+      "js": ["d1.academic.history.js"]
+    }
+  ],
+  "web_accessible_resources": ["d1.common.css","bootstrapiso.min.css"]
+}
