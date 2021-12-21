@@ -16,10 +16,10 @@
         }
 
         //names holds two properties: assignee and wf_owner
-        var names = mapAssignee(selected_option);
+        var names = listUser(selected_option);
 
         //Functions
-        function mapAssignee(program_office){
+        function listUser(program_office){
             var assignee_selector = null;
             var wf_owner_selector = null;
 
