@@ -53,8 +53,30 @@
             text: element
             }).appendTo('#user-list');
         });
-
     }
+
+    //Checkbox TO FIX
+    jq$(".fullWidthTable").each(function () {
+        $('<td class="goldTableTitle">Select</td>').prependTo(
+            $(this).find("tr").eq(1)
+        );
+        var value = $(this).find("tr").eq(2).children(":first").text();
+        $(
+        '<td class="goldTableCell" valign="top">' +
+            '<input type="checkbox" name="event" style="margin:0" value="' +
+            value +
+            '">' +
+            "</td>"
+        ).prependTo($(this).find("tr").eq(2));
+    });
+
+    var all_checked = [];
+    jq$(".goldTableCell input:checkbox").change(function() {
+        if(jq$(this).checked) {
+            checked_value.push(this.value);
+        }
+        console.log(all_checked);
+    });
 
 
 
