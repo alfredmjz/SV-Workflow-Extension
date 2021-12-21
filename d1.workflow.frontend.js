@@ -16,30 +16,63 @@
         var cu_map = mapFromDropdown(cu_selector);
     }
 
-    //names holds two properties: assignee and wf_owner
-    var names = mapAssignee(selected_option);
+    if(selected_option == 4){
+        //Don't generate table for Dean's Office
+    }
+    else{
+        //names holds two properties: assignee and wf_owner
+        var names = mapAssignee(selected_option);
 
-    jq$('[name="programOfficeId"]').closest('tr').append('<td id="flexcontainer"> <div id="flexbox">'
-    + '<div class="user-flexchild"> </div>'
-    + '<div class="event-flexchild"> </div>'
-    + '</div></td>');
+        jq$('[name="programOfficeId"]').closest('td').addClass("alignBar");
+        jq$('[name="programOfficeId"]').closest('tr').append('<td id="flexcontainer"> <div id="flexbox">'
+        + '<div class="user-flexchild"> </div>'
+        + '<div class="assigned-flexchild"> </div>'
+        + '</div></td>');
 
-    jq$('.user-flexchild').append(
-        '<ul id="user-flexchild">'
-        + '<li class="flex-col-attr">User</li>'
-        + '</ul>');
+        jq$('.user-flexchild').append(
+            '<ul id="user-list" class="content-list">'
+            + '<li class="flex-first-row">User</li>'
+            + '</ul>');
 
-    jq$('.event-flexchild').append(
-        '<ul id="event-flexchild">'
-        + '<li class="flex-col-attr">Assignee</li>'
-        + '</ul>');
-    console.log(names.assignee);
+        jq$('.assigned-flexchild').append(
+            '<ul id="assigned-list" class="content-list">'
+            + '<li class="flex-first-row">Assignee</li>'
+            + '</ul>');
 
-    jq$.each(names.assignee, function(index, element){
-        jq$('.user-flexchild').append('<li>' + element + '</li>');
-    })
+        jq$('#flexcontainer').append(
+            '<div id="button-wrapper">'
+            +'<button type="button" id="applyAssign" class="yui3-button" onclick="" value="Apply">Apply</button>'
+            +'<button type="button" id="applyReset" class="yui3-button" onclick="" value="Reset">Reset</button>'
+            +'</div>');
+
+        jq$.each(names.assignee, function(index, element){
+            //Append list to table for availble users in the current PO/CU
+            jq$('<li>', {
+            class: 'flex-list-items list-user',
+            value: index,
+            text: element
+            }).appendTo('#user-list');
+        });
+
+    }
+
+
 
         //Functions
+        jq$('.flex-list-items').click(function(){
+            //Move selected user to right of table
+            if(jq$(this).hasClass('list-user')){
+                jq$(this).appendTo('#assigned-list');
+                jq$(this).addClass('list-assigned').removeClass('list-user');
+            }
+
+            //Move selected user to left of table
+            else if(jq$(this).hasClass('list-assigned')){
+                jq$(this).appendTo('#user-list');
+                jq$(this).addClass('list-user').removeClass('list-assigned');
+            }
+        });
+
 
         function mapAssignee(program_office){
             var assignee_selector = null;
@@ -91,7 +124,10 @@
             return {"assignee": assignee, "wf_owner" : wf_owner};
         }
 
+
+
         function mapFromDropdown(dropdown_selector){
+            //TODO: Sort value alphabetically
             var result = {};
 
             jq$(dropdown_selector).each(function(){
