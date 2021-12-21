@@ -1,0 +1,70 @@
+.alignBar{
+    vertical-align: text-top;
+}
+#flexcontainer{
+    display: block;
+    margin-left: 30px;
+    text-align: left;
+    position: relative;
+}
+
+#flexbox{
+    display:flex;
+    flex-flow: row wrap;
+    justify-content: space-between;
+    list-style: none;
+    align-items: start;
+    border: 1px solid black;
+    margin: 0;
+    padding: 0;
+}
+
+.user-flexchild, .assigned-flexchild{
+    font-family: inherit;
+    font-size: inherit;
+    width:10vw;
+    height: 13vw;
+    overflow-y: scroll;
+}
+
+.assigned-flexchild{
+    border-left: solid 1px black;
+}
+.content-list{
+    list-style: none;
+    height: 100%;
+}
+
+.flex-first-row{
+    text-align: center;
+    padding: 5px 0;
+    border-bottom: 1px solid black;
+}
+
+.flex-list-items{
+    padding-left: 5px;
+    user-select: none;
+    cursor: pointer;
+}
+
+.flex-list-items:hover{
+    background-color: #ACCEF7;
+}
+
+#button-wrapper{
+    height: 100%;
+    text-align: center;
+    margin-top: 10px;
+}
+
+#applyAssign{
+    margin-right: 10px;
+    background-color: var(--primary-intra-form-button-color);
+    color: white;
+}
+#applyReset{
+    margin-left:10px;
+}
+#applyAssign, #applyReset{
+    height: 15px;
+}
