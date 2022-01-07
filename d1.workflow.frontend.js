@@ -1,6 +1,5 @@
 (function(jq$){
     'use strict';
-
     //Array of Program Office
     var program_office_selector = jq$('[name="programOfficeId"] option');
     var program_office = mapFromDropdown(program_office_selector);
@@ -55,7 +54,7 @@
         });
     }
 
-    //Checkbox TO FIX
+    //TODO: remove whitespace and newlines
     jq$(".fullWidthTable").each(function () {
         $('<td class="goldTableTitle">Select</td>').prependTo(
             $(this).find("tr").eq(1)
@@ -70,12 +69,14 @@
         ).prependTo($(this).find("tr").eq(2));
     });
 
-    var all_checked = [];
-    jq$(".goldTableCell input:checkbox").change(function() {
-        if(jq$(this).checked) {
-            checked_value.push(this.value);
+    var all_checked = [];   //Contains values of only checked box
+    $('.goldTableCell input:checkbox').change(function() {
+        if(jq$(this).is(":checked")) {
+            all_checked.push(this.value);
         }
-        console.log(all_checked);
+        else{
+            all_checked.splice(all_checked.indexOf(this.value), 1);
+        }
     });
 
 
@@ -149,14 +150,18 @@
 
 
         function mapFromDropdown(dropdown_selector){
-            //TODO: Sort value alphabetically
             var result = {};
 
             jq$(dropdown_selector).each(function(){
                 result[parseInt(this.value)] = this.text;
             })
-
+            sortList(result);
             return result;
+        }
+
+        //TODO: Sort value alphabetically
+        function sortList(list) {
+
         }
 
 })(jQuery);
