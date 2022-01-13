@@ -2,7 +2,7 @@
     'use strict';
     //Array of Program Office
     var program_office_selector = jq$('[name="programOfficeId"] option');
-    var program_office = mapFromDropdown(program_office_selector);
+    var program_office = mapFromElement(program_office_selector);
 
     //Convert String type to number
     var selected_option = parseInt(jq$('[name="programOfficeId"] option:selected').val());
@@ -12,7 +12,7 @@
     //Indexes of non costing units are: [5,4,1]
     if(jq$.inArray(selected_option, no_cu) === -1){
         var cu_selector = jq$('[name="costingUnitId"] option');
-        var cu_map = mapFromDropdown(cu_selector);
+        var cu_map = mapFromElement(cu_selector);
     }
 
     if(selected_option == 4){
@@ -22,6 +22,7 @@
         //names holds two properties: assignee and wf_owner
         var names = mapAssignee(selected_option);
 
+        //Creating Table view
         jq$('[name="programOfficeId"]').closest('td').addClass("alignBar");
         jq$('[name="programOfficeId"]').closest('tr').append('<td id="flexcontainer"> <div id="flexbox">'
         + '<div class="user-flexchild"> </div>'
@@ -40,73 +41,141 @@
 
         jq$('#flexcontainer').append(
             '<div id="button-wrapper">'
-            +'<button type="button" id="applyAssign" class="yui3-button" onclick="" value="Apply">Apply</button>'
-            +'<button type="button" id="applyReset" class="yui3-button" onclick="" value="Reset">Reset</button>'
+            +'<button type="button" id="applyAssign" class="yui3-button">Assign All</button>'
+            +'<button type="button" id="applyClear" class="yui3-button">Clear</button>'
             +'</div>');
 
-        jq$.each(names.assignee, function(index, element){
-            //Append list to table for availble users in the current PO/CU
-            jq$('<li>', {
-            class: 'flex-list-items list-user',
-            value: index,
-            text: element
-            }).appendTo('#user-list');
+        //Append list to table for availble users in the current PO/CU
+        addNameList("default");
+    }
+
+    //Create checkboxes for each event
+    var officeName = jq$("table").find(":selected").attr("value");
+    var applicableOffice = ["18153", "18356", "21453563"];
+    var value = jq$(".fullWidthTable")
+            .find("tr:even")
+            .not(":first")
+            .children(":first")
+            .text();
+    if (applicableOffice.includes(officeName)) {
+        jq$(".fullWidthTable").each(function () {
+            jq$('<td class="goldTableTitle">Select</td>').prependTo(
+            jq$(this).find("tr").eq(1)
+        );
+
+
+        jq$(
+            '<td class="goldTableCell" valign="top">' +
+            '<input type="checkbox" name="event" style="margin:0">' +
+            "</td>"
+        ).prependTo(jq$(this).find("tr:even").not(":first"));
         });
     }
 
-    //TODO: remove whitespace and newlines
-    jq$(".fullWidthTable").each(function () {
-        $('<td class="goldTableTitle">Select</td>').prependTo(
-            $(this).find("tr").eq(1)
-        );
-        var value = $(this).find("tr").eq(2).children(":first").text();
-        $(
-        '<td class="goldTableCell" valign="top">' +
-            '<input type="checkbox" name="event" style="margin:0" value="' +
-            value +
-            '">' +
-            "</td>"
-        ).prependTo($(this).find("tr").eq(2));
-    });
-
     var all_checked = [];   //Contains values of only checked box
-    $('.goldTableCell input:checkbox').change(function() {
+    jq$('.goldTableCell [name="event"]').change(function() {
         if(jq$(this).is(":checked")) {
-            all_checked.push(this.value);
+            all_checked.push(value);
         }
         else{
-            all_checked.splice(all_checked.indexOf(this.value), 1);
+            all_checked.splice(all_checked.indexOf(value), 1);
         }
+        console.log(all_checked);
     });
 
 
 
         //Functions
+        var pos;
+
         jq$('.flex-list-items').click(function(){
             //Move selected user to right of table
+            pos = findPos(names.assignee, jq$(this).text());
             if(jq$(this).hasClass('list-user')){
-                jq$(this).appendTo('#assigned-list');
+                jq$(this).replaceWith('');
+                jq$('#assigned-list > li:eq(' + pos + ')').replaceWith(this);
                 jq$(this).addClass('list-assigned').removeClass('list-user');
             }
 
             //Move selected user to left of table
             else if(jq$(this).hasClass('list-assigned')){
-                jq$(this).appendTo('#user-list');
+                jq$(this).replaceWith('');
+                jq$('#user-list > li:eq(' + pos + ')').replaceWith(this);
                 jq$(this).addClass('list-user').removeClass('list-assigned');
             }
         });
 
+        jq$("#applyAssign").click(function(){
+            jq$(".list-user").remove();
+            jq$(".list-assigned").remove();
+            addNameList("assign");
+        });
+
+        jq$("#applyClear").click(function(){
+            jq$(".list-user").remove();
+            jq$(".list-assigned").remove();
+            addNameList("default");
+        });
+
+        //default = all names on left of table
+        //assign = all names on right of table
+        function addNameList(mode){
+            if(mode == "default"){
+                jq$.each(names.assignee, function(name, id){
+                    jq$('<li>', {
+                    class: 'flex-list-items list-user',
+                    value: id,
+                    text: name,
+                    }).appendTo('#user-list');
+                });
+                jq$.each(names.assignee, function(){
+                    jq$('<li>', {
+                    class: 'flex-list-items list-assigned',
+                    value: "",
+                    text: "",
+                    }).appendTo('#assigned-list');
+                });
+            }
+
+            else if(mode == "assign"){
+                    jq$.each(names.assignee, function(){
+                        jq$('<li>', {
+                        class: 'flex-list-items list-user',
+                        value: '',
+                        text: '',
+                        }).appendTo('#user-list');
+                    });
+                    jq$.each(names.assignee, function(name, id){
+                        jq$('<li>', {
+                        class: 'flex-list-items list-assigned',
+                        value: id,
+                        text: name,
+                        }).appendTo('#assigned-list');
+                });
+            }
+        }
+
+        //Find index of keys from dictionary
+        function findPos(dict, target){
+            var index = 1; //Dictionary starts with '' as index 0 but is not visible in list
+            for(var name in dict){
+                if(name == target){
+                    break;
+                }
+                ++index;
+            }
+            return index;
+        }
 
         function mapAssignee(program_office){
             var assignee_selector = null;
             var wf_owner_selector = null;
 
-
             if(program_office == 5){
                 assignee_selector = jq$('[name="taskAssigneesInfo[0].selectedAssignee[2]"] option');
             }
 
-            //These program office have same html tag names
+            //These program office have the same html tag names
             else if(program_office == 18153 || program_office == 18356){
                 var selected_cu = parseInt(jq$('[name="costingUnitId"] option:selected').val());
 
@@ -140,8 +209,8 @@
                 wf_owner_selector = jq$('[name="processOverseer[50]"] option');
             }
 
-            var assignee = mapFromDropdown(assignee_selector);
-            var wf_owner = mapFromDropdown(wf_owner_selector);
+            var assignee = mapFromElement(assignee_selector);
+            var wf_owner = mapFromElement(wf_owner_selector);
 
 
             return {"assignee": assignee, "wf_owner" : wf_owner};
@@ -149,19 +218,14 @@
 
 
 
-        function mapFromDropdown(dropdown_selector){
+        function mapFromElement(HTML_selector){
             var result = {};
 
-            jq$(dropdown_selector).each(function(){
-                result[parseInt(this.value)] = this.text;
+            jq$(HTML_selector).each(function(){
+                result[this.text] = this.value;
             })
-            sortList(result);
             return result;
         }
 
-        //TODO: Sort value alphabetically
-        function sortList(list) {
-
-        }
-
 })(jQuery);
+
