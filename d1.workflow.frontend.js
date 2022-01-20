@@ -1,26 +1,26 @@
 (function(jq$){
-    'use strict';
-    //Array of Program Office
-    var program_office_selector = jq$('[name="programOfficeId"] option');
-    var program_office = mapFromElement(program_office_selector);
+	'use strict';
+	//jq$ is jQuery
+	//d1$ is a global object for common functions and variables
+    var debugging = true;
+
 
     //Convert String type to number
-    var selected_option = parseInt(jq$('[name="programOfficeId"] option:selected').val());
+    var selected_office = parseInt(jq$('[name="programOfficeId"] option:selected').val());
     const no_cu = [5, 4, 1];
 
     //True if current Program Office have a costing unit
     //Indexes of non costing units are: [5,4,1]
-    if(jq$.inArray(selected_option, no_cu) === -1){
-        var cu_selector = jq$('[name="costingUnitId"] option');
-        var cu_map = mapFromElement(cu_selector);
+    if(jq$.inArray(selected_office, no_cu) === -1){
+        var selected_cu = parseInt(jq$('[name="costingUnitId"] option:selected').val()); //Selected CU
     }
 
-    if(selected_option == 4){
+    if(selected_office == 4){
         //Don't generate table for Dean's Office
     }
     else{
         //names holds two properties: assignee and wf_owner
-        var names = mapAssignee(selected_option);
+        var names = mapAssignee(selected_office, selected_cu);
 
         //Creating Table view
         jq$('[name="programOfficeId"]').closest('td').addClass("alignBar");
@@ -41,8 +41,9 @@
 
         jq$('#flexcontainer').append(
             '<div id="button-wrapper">'
-            +'<button type="button" id="applyAssign" class="yui3-button">Assign All</button>'
-            +'<button type="button" id="applyClear" class="yui3-button">Clear</button>'
+            +'<button type="button" id="moveAllLeft" class="yui3-button"><<</button>'
+            +'<button type="button" id="applySubmit" class="yui3-button">Submit</button>'
+            +'<button type="button" id="moveAllRight" class="yui3-button">>></button>'
             +'</div>');
 
         //Append list to table for availble users in the current PO/CU
@@ -52,35 +53,32 @@
     //Create checkboxes for each event
     var officeName = jq$("table").find(":selected").attr("value");
     var applicableOffice = ["18153", "18356", "21453563"];
-    var value = jq$(".fullWidthTable")
-            .find("tr:even")
-            .not(":first")
-            .children(":first")
-            .text();
     if (applicableOffice.includes(officeName)) {
         jq$(".fullWidthTable").each(function () {
             jq$('<td class="goldTableTitle">Select</td>').prependTo(
-            jq$(this).find("tr").eq(1)
-        );
-
-
-        jq$(
-            '<td class="goldTableCell" valign="top">' +
-            '<input type="checkbox" name="event" style="margin:0">' +
-            "</td>"
-        ).prependTo(jq$(this).find("tr:even").not(":first"));
+                jq$(this).find("tr").eq(1)
+            );
+            var value = jq$(this)
+                .find("tr:even")
+                .not(":first")
+                .children(":first")
+                .text();
+            jq$(
+                '<td class="goldTableCell" valign="top">' +
+                '<input type="checkbox" name="event" style="margin:0">' +
+                "</td>"
+            ).prependTo(jq$(this).find("tr:even").not(":first"));
         });
     }
 
-    var all_checked = [];   //Contains values of only checked box
+    var checked_events = [];   //Contains values of only checked box
     jq$('.goldTableCell [name="event"]').change(function() {
         if(jq$(this).is(":checked")) {
-            all_checked.push(value);
+            checked_events.push(value);
         }
         else{
-            all_checked.splice(all_checked.indexOf(value), 1);
+            checked_events.splice(checked_events.indexOf(value), 1);
         }
-        console.log(all_checked);
     });
 
 
@@ -88,37 +86,87 @@
         //Functions
         var pos;
 
-        jq$('.flex-list-items').click(function(){
+        //on function delegate previous DOM objects to its current modified version
+        jq$('.content-list').on("click",".flex-list-items", function(){
             //Move selected user to right of table
             pos = findPos(names.assignee, jq$(this).text());
+
             if(jq$(this).hasClass('list-user')){
-                jq$(this).replaceWith('');
+                jq$(this).replaceWith("<li class='flex-list-items list-user'></li>");
                 jq$('#assigned-list > li:eq(' + pos + ')').replaceWith(this);
                 jq$(this).addClass('list-assigned').removeClass('list-user');
             }
 
             //Move selected user to left of table
             else if(jq$(this).hasClass('list-assigned')){
-                jq$(this).replaceWith('');
+                jq$(this).replaceWith("<li class='flex-list-items list-assigned'></li>");
                 jq$('#user-list > li:eq(' + pos + ')').replaceWith(this);
                 jq$(this).addClass('list-user').removeClass('list-assigned');
             }
         });
 
-        jq$("#applyAssign").click(function(){
+
+        jq$("#applySubmit").click(function(){
+            var finalized_name = mapFromElement(jq$('.list-assigned'));
+            makePostCall(finalized_name, checked_events, selected_office, selected_cu);
+            window.location.reload();
+        });
+
+
+        function makePostCall(assignee, events, program_office, costing_unit){
+            //TODO: Pass finalized_name to backend and reflect on tables after save
+            if(isNaN(costing_unit)){
+                costing_unit = "";
+            }
+            jq$.each(assignee, function(name, id){
+                jq$.ajax({
+                    type: "POST",
+                    async: false,
+                    data: {
+                        method: 'addTaskAssignee',
+                        programOfficeId: program_office,
+                        displayPage: false,
+                        costingUnitId: costing_unit,
+                        processIndex: 17,
+                        taskIndex: 1,
+                        roleId: 0,
+                        taskAssigneeId: id,
+                        'processOverseer[17]': "",
+                        'taskAssigneesInfo[17].selectedRole[1]': "",
+                        'taskAssigneesInfo[17].selectedAssignee[1]': id,
+                        'taskAssigneesInfo[17].ccMail[1]': "",
+                    },
+                    url: 'https://'
+                    + ((d1$.isEmpty(d1$.hostname)) ? window.location.hostname : d1$.hostname)
+                    +'/srs/sysadmin/system/programOfficeTaskSetup.do?',
+
+                    success : function(data) {
+                        if(debugging) console.log('Data: '+ data);
+                    },
+                    error : function(msg)
+                    {
+                        if(debugging) console.log("Update FAILED: "+ msg);
+                    }
+                });
+            });
+        }
+
+
+        jq$("#moveAllRight").click(function(){
             jq$(".list-user").remove();
             jq$(".list-assigned").remove();
             addNameList("assign");
+
         });
 
-        jq$("#applyClear").click(function(){
+        jq$("#moveAllLeft").click(function(){
             jq$(".list-user").remove();
             jq$(".list-assigned").remove();
             addNameList("default");
         });
 
-        //default = all names on left of table
-        //assign = all names on right of table
+        //default = push all names to left of table
+        //assign = push all names to right of table
         function addNameList(mode){
             if(mode == "default"){
                 jq$.each(names.assignee, function(name, id){
@@ -131,8 +179,6 @@
                 jq$.each(names.assignee, function(){
                     jq$('<li>', {
                     class: 'flex-list-items list-assigned',
-                    value: "",
-                    text: "",
                     }).appendTo('#assigned-list');
                 });
             }
@@ -141,8 +187,6 @@
                     jq$.each(names.assignee, function(){
                         jq$('<li>', {
                         class: 'flex-list-items list-user',
-                        value: '',
-                        text: '',
                         }).appendTo('#user-list');
                     });
                     jq$.each(names.assignee, function(name, id){
@@ -157,7 +201,7 @@
 
         //Find index of keys from dictionary
         function findPos(dict, target){
-            var index = 1; //Dictionary starts with '' as index 0 but is not visible in list
+            var index = 1;
             for(var name in dict){
                 if(name == target){
                     break;
@@ -167,7 +211,7 @@
             return index;
         }
 
-        function mapAssignee(program_office){
+        function mapAssignee(program_office, costing_unit){
             var assignee_selector = null;
             var wf_owner_selector = null;
 
@@ -177,10 +221,8 @@
 
             //These program office have the same html tag names
             else if(program_office == 18153 || program_office == 18356){
-                var selected_cu = parseInt(jq$('[name="costingUnitId"] option:selected').val());
-
                 //value of first costing unit if exist is NaN
-                if(isNaN(selected_cu)){
+                if(isNaN(costing_unit)){
                     assignee_selector = jq$('[name="taskAssigneesInfo[16].selectedAssignee[1]"] option');
                     wf_owner_selector = jq$('[name="processOverseer[16]"] option');
                 }
@@ -222,7 +264,9 @@
             var result = {};
 
             jq$(HTML_selector).each(function(){
-                result[this.text] = this.value;
+                if(jq$(this).text() != ""){
+                    result[jq$(this).text()] = jq$(this).val();
+                }
             })
             return result;
         }
