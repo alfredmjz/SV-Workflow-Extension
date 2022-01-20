@@ -58,14 +58,13 @@
     margin-top: 10px;
 }
 
-#applyAssign{
-    margin-right: 10px;
-    background-color: var(--primary-intra-form-button-color);
-    color: white;
+
+#moveAllRight{
+    margin-left: 3em;
 }
-#applyReset{
-    margin-left:10px;
+#moveAllLeft{
+    margin-right: 3em;
 }
-#applyAssign, #applyReset{
+#moveAllLeft, #moveAllRight, #applySubmit{
     height: 15px;
 }
