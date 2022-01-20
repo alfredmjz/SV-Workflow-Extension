@@ -10,7 +10,7 @@
 
 #flexbox{
     display:flex;
-    flex-flow: row wrap;
+    flex-flow: row nowrap;
     justify-content: space-between;
     list-style: none;
     align-items: start;
