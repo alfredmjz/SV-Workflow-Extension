@@ -133,7 +133,8 @@
         "https://*/srs/sysadmin/system/programOfficeTaskSetup.do*"
       ],
       "css": ["d1.workflow.css"],
-      "js": ["d1.workflow.frontend.js", "d1.workflow.backend.js"]
+      "js": ["d1.workflow.frontend.js"]
+
     }
   ],
   "web_accessible_resources": ["d1.common.css","bootstrapiso.min.css"]
