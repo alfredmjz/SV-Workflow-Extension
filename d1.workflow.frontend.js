@@ -53,40 +53,49 @@
     //Create checkboxes for each event
     var officeName = jq$("table").find(":selected").attr("value");
     var applicableOffice = ["18153", "18356", "21453563"];
+    var value = jq$(".fullWidthTable")
+    .find("tr:even")
+    .not(":first")
+    .children(":first")
+    .text();
+
     if (applicableOffice.includes(officeName)) {
         jq$(".fullWidthTable").each(function () {
-            jq$('<td class="goldTableTitle">Select</td>').prependTo(
-                jq$(this).find("tr").eq(1)
-            );
-            var value = jq$(this)
-                .find("tr:even")
-                .not(":first")
-                .children(":first")
-                .text();
-            jq$(
-                '<td class="goldTableCell" valign="top">' +
-                '<input type="checkbox" name="event" style="margin:0">' +
-                "</td>"
-            ).prependTo(jq$(this).find("tr:even").not(":first"));
+                //Insert Select Title
+                jq$('<td class="goldTableTitle"> Select </td>').prependTo(jq$(this).find("tr").eq(1));
+
+                //Insert Checkbox
+                jq$('<td class="goldTableCell" valign="top">'
+                +'<input type="checkbox" name="event" style="margin:0">'
+                +"</td>").prependTo(jq$(this).find("tr").filter( ":nth-child(2n + 3)"));
         });
     }
 
     var checked_events = [];   //Contains values of only checked box
+    var tableName = null;
+    var tableID = [];
+    var index = null;
+    var extract_col = null;
     jq$('.goldTableCell [name="event"]').change(function() {
         if(jq$(this).is(":checked")) {
             checked_events.push(value);
+            //Get ID of checked tables
+            tableName = jq$(this).closest("table.fullWidthTable");
+            extract_col = jq$(tableName).find(".goldTableCell:eq(4) .smallMarginWrapper select").attr("name");
+            index = extract_col.substring(extract_col.indexOf('[') + 1, extract_col.indexOf(']'));
+            tableID.push(index);
         }
         else{
             checked_events.splice(checked_events.indexOf(value), 1);
+            tableID.splice(tableID.indexOf(index), 1);
         }
     });
 
 
+        /*********Functions**********/
 
-        //Functions
         var pos;
-
-        //on function delegate previous DOM objects to its current modified version
+        //".on" function delegate previous DOM objects to its current modified version (can't use .click)
         jq$('.content-list').on("click",".flex-list-items", function(){
             //Move selected user to right of table
             pos = findPos(names.assignee, jq$(this).text());
@@ -108,47 +117,53 @@
 
         jq$("#applySubmit").click(function(){
             var finalized_name = mapFromElement(jq$('.list-assigned'));
-            makePostCall(finalized_name, checked_events, selected_office, selected_cu);
+            makePostCall(finalized_name, tableID, selected_office, selected_cu);
             window.location.reload();
         });
 
 
-        function makePostCall(assignee, events, program_office, costing_unit){
+        function makePostCall(assignee, eventID, program_office, costing_unit){
             //TODO: Pass finalized_name to backend and reflect on tables after save
             if(isNaN(costing_unit)){
                 costing_unit = "";
             }
-            jq$.each(assignee, function(name, id){
-                jq$.ajax({
-                    type: "POST",
-                    async: false,
-                    data: {
+
+            for(index in eventID){
+                jq$.each(assignee, function(name, id){
+                    var postData = {
                         method: 'addTaskAssignee',
                         programOfficeId: program_office,
                         displayPage: false,
                         costingUnitId: costing_unit,
-                        processIndex: 17,
+                        processIndex: index,
                         taskIndex: 1,
                         roleId: 0,
                         taskAssigneeId: id,
-                        'processOverseer[17]': "",
-                        'taskAssigneesInfo[17].selectedRole[1]': "",
-                        'taskAssigneesInfo[17].selectedAssignee[1]': id,
-                        'taskAssigneesInfo[17].ccMail[1]': "",
-                    },
-                    url: 'https://'
-                    + ((d1$.isEmpty(d1$.hostname)) ? window.location.hostname : d1$.hostname)
-                    +'/srs/sysadmin/system/programOfficeTaskSetup.do?',
-
-                    success : function(data) {
-                        if(debugging) console.log('Data: '+ data);
-                    },
-                    error : function(msg)
-                    {
-                        if(debugging) console.log("Update FAILED: "+ msg);
                     }
+                    postData['processOverseer[' + index + ']'] = index
+                    postData['taskAssigneesInfo[' + index + '].selectedRole[1]'] = index
+                    postData['taskAssigneesInfo[' + index + '].selectedAssignee[1]'] = id
+                    postData['taskAssigneesInfo[' + index + '].ccMail[1]'] = index
+
+                    jq$.ajax({
+                        type: "POST",
+                        async: false,
+                        data: postData,
+                        url: 'https://'
+                        + ((d1$.isEmpty(d1$.hostname)) ? window.location.hostname : d1$.hostname)
+                        +'/srs/sysadmin/system/programOfficeTaskSetup.do?',
+
+                        success : function(data) {
+                            if(debugging) console.log('Data: '+ data);
+                        },
+                        error : function(msg)
+                        {
+                            if(debugging) console.log("Update FAILED: "+ msg);
+                        }
+                    });
                 });
-            });
+            }
+
         }
 
 
