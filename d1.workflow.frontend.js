@@ -74,7 +74,7 @@
 
     var tableName = null;
     var extract_col = null;
-    var tableID = {};
+    var tableID = [];
     var taskAssigneesInfo;
     var selectedAssignee;
     jq$('.goldTableCell [name="event"]').change(function() {
@@ -82,8 +82,8 @@
             //Get ID of checked tables
             tableName = jq$(this).closest("table.fullWidthTable tr");
             extract_col = jq$(tableName).find(".goldTableCell:eq(4) .smallMarginWrapper select").attr("name");
-            taskAssigneesInfo = extract_col.substring(extract_col.indexOf('[') + 1, extract_col.indexOf(']'));
-            selectedAssignee = extract_col.substring(extract_col.lastIndexOf('[') + 1, extract_col.lastIndexOf(']'));
+            taskAssigneesInfo = parseInt(extract_col.substring(extract_col.indexOf('[') + 1, extract_col.indexOf(']')));
+            selectedAssignee = parseInt(extract_col.substring(extract_col.lastIndexOf('[') + 1, extract_col.lastIndexOf(']')));
             if (!tableID[taskAssigneesInfo]) {
                 tableID[taskAssigneesInfo] = [];
             }
@@ -144,25 +144,17 @@
         var finalized_name = "";
         jq$("#applySubmit").click(function(){
             finalized_name = mapFromElement(jq$('.list-assigned'));
-            makePostCall('addTaskAssignee',finalized_name, tableID, selected_office, selected_cu);
+            makePostCall('addTaskAssignee', finalized_name, tableID, selected_office, selected_cu);
             window.location.reload();
         });
 
-        //Removes all assignment and reset table to blank view
-        // jq$("#removeAll").click(function(){
-        //     finalized_name = mapFromElement(jq$('.list-user'));
-        //     jq$('.fullWidthTable').each(function(){
-
-        //     });
-        //     makePostCall('deleteTaskAssignee', finalized_name, tableID, selected_office, selected_cu);
-        //     window.location.reload();
-        // });
 
         function makePostCall(methodName, assignee, eventID, program_office, costing_unit){
             if(isNaN(costing_unit)){
                 costing_unit = "";
             }
 
+            //Fixed data
             var postData = {
                 method: methodName,
                 programOfficeId: program_office,
@@ -171,17 +163,22 @@
                 roleId: 0,
             };
 
+
+
             //TODO: Reduce time complexity for POST
-            for(const key in Object.keys(eventID)){
-                for(const value of Object.values(eventID[key])){
-                    jq$.each(assignee, function(name, id){
+            //Dynamic data
+            var eventIndex;
+            jq$.each(assignee, function(name, id){
+                for (var key = 0; key < eventID.length; key++) {
+                    postData['processIndex'] = key
+                    postData['processOverseer[' + key + ']'] = "";
+                    for(var value = 0; value < eventID[key].length; value++){
+                        eventIndex = eventID[key][value];
+                        postData['taskIndex'] = eventIndex
                         postData['taskAssigneeId'] = id;
-                        postData['processOverseer[' + key + ']'] = "";
-                        postData['processIndex'] = key
-                        postData['taskIndex'] = value
-                        postData['taskAssigneesInfo[' + key + '].selectedRole[' + value + ']'] = "";
-                        postData['taskAssigneesInfo[' + key + '].selectedAssignee[' + value + ']'] = id;
-                        postData['taskAssigneesInfo[' + key + '].ccMail[' + value + ']'] = "";
+                        postData['taskAssigneesInfo[' + key + '].selectedRole[' + eventIndex + ']'] = "";
+                        postData['taskAssigneesInfo[' + key + '].selectedAssignee[' + eventIndex + ']'] = id;
+                        postData['taskAssigneesInfo[' + key + '].ccMail[' + eventIndex + ']'] = "";
 
                         jq$.ajax({
                             type: "POST",
@@ -199,9 +196,9 @@
                                 if(debugging) console.log("Update FAILED: "+ msg);
                             }
                         });
-                    });
+                    }
                 }
-            }
+            });
         };
 
 
@@ -250,6 +247,10 @@
                 ++index;
             }
             return index;
+        }
+
+        function mapProcessOverseer(program_office, costing_unit){
+            var process_overseer = jq$("select[name='processOverseer[' + 1 + ']').attr("value");
         }
 
         function mapAssignee(program_office, costing_unit){
