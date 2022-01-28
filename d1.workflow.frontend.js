@@ -44,7 +44,6 @@
             +'<button type="button" id="moveAllLeft" class="yui3-button"><<</button>'
             +'<button type="button" id="applySubmit" class="yui3-button">Submit</button>'
             +'<button type="button" id="moveAllRight" class="yui3-button">>></button>'
-            +'<button type="button" id="removeAll" class="yui3-button">Remove All</button>'
             +'</div>');
 
         //Append list to table for availble users in the current PO/CU
@@ -54,11 +53,6 @@
     //Create checkboxes for each event
     var officeName = jq$("table").find(":selected").attr("value");
     var applicableOffice = ["18153", "18356", "21453563"];
-    var value = jq$(".fullWidthTable")
-    .find("tr:even")
-    .not(":first")
-    .children(":first")
-    .text();
 
     if (applicableOffice.includes(officeName)) {
         jq$(".fullWidthTable").each(function () {
@@ -141,9 +135,8 @@
             addNameList("default");
         });
 
-        var finalized_name = "";
         jq$("#applySubmit").click(function(){
-            finalized_name = mapFromElement(jq$('.list-assigned'));
+            var finalized_name = mapFromElement(jq$('.list-assigned'));
             makePostCall('addTaskAssignee', finalized_name, tableID, selected_office, selected_cu);
             window.location.reload();
         });
@@ -154,7 +147,7 @@
                 costing_unit = "";
             }
 
-            //Fixed data
+            //Static data
             var postData = {
                 method: methodName,
                 programOfficeId: program_office,
@@ -163,9 +156,6 @@
                 roleId: 0,
             };
 
-
-
-            //TODO: Reduce time complexity for POST
             //Dynamic data
             var eventIndex;
             jq$.each(assignee, function(name, id){
@@ -249,7 +239,7 @@
             return index;
         }
 
-
+        //Extract names from dropdown box
         function mapAssignee(program_office, costing_unit){
             var assignee_selector = null;
             var wf_owner_selector = null;
@@ -298,6 +288,7 @@
         }
 
 
+        //Convert text and value to a list
         function mapFromElement(HTML_selector){
             var result = {};
 
