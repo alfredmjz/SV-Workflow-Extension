@@ -249,9 +249,6 @@
             return index;
         }
 
-        function mapProcessOverseer(program_office, costing_unit){
-            var process_overseer = jq$("select[name='processOverseer[' + 1 + ']').attr("value");
-        }
 
         function mapAssignee(program_office, costing_unit){
             var assignee_selector = null;
