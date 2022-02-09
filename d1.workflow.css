@@ -108,3 +108,60 @@ button:disabled {
 .selectedEventItem {
   background-color: rgb(172, 206, 247);
 }
+
+#loadDisplay {
+  display: none;
+  position: relative;
+  width: 30em;
+  height: 200px;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+
+#allRows {
+  -ms-transform: scale(1.5); /* IE */
+  -moz-transform: scale(1.5); /* FF */
+  -webkit-transform: scale(1.5); /* Safari and Chrome */
+  -o-transform: scale(1.5); /* Opera */
+  transform: scale(1.5);
+  margin: 5px;
+}
+input[type="checkbox"][name="event"] {
+  -ms-transform: scale(1.5); /* IE */
+  -moz-transform: scale(1.5); /* FF */
+  -webkit-transform: scale(1.5); /* Safari and Chrome */
+  -o-transform: scale(1.5); /* Opera */
+  transform: scale(1.5);
+  margin: 10px 5px;
+}
+
+#loader {
+  position: absolute;
+  left: 38%;
+  border: 16px solid #f3f3f3; /* Light grey */
+  border-top: 16px solid #3498db; /* Blue */
+  border-radius: 50%;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+#processes {
+  font-size: 1.2rem;
+  width: 100%;
+  position: absolute;
+  display: inline-block;
+  left: 0%;
+  top: 80%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
