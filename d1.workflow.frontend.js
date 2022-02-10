@@ -108,6 +108,12 @@
         .siblings()
         .find('[name="event"]')
         .prop("checked", true);
+    } else {
+      jq$(this)
+        .closest("tr")
+        .siblings()
+        .find('[name="event"]')
+        .prop("checked", false);
     }
   });
 
