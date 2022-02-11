@@ -96,49 +96,6 @@
     });
   }
 
-  var tableName = null;
-  var extract_col = null;
-  var tableID = [];
-  var taskAssigneesInfo;
-  var selectedAssignee;
-  jq$("#allRows").change(function () {
-    if (jq$(this).is(":checked")) {
-      jq$(this)
-        .closest("tr")
-        .siblings()
-        .find('[name="event"]')
-        .prop("checked", true);
-    }
-  });
-
-  jq$('.goldTableCell [name="event"]').change(function () {
-    if (jq$(this).is(":checked")) {
-      //Get ID of checked tables
-      tableName = jq$(this).closest("table.fullWidthTable tr");
-      extract_col = jq$(tableName)
-        .find(".goldTableCell:eq(4) .smallMarginWrapper select")
-        .attr("name");
-      taskAssigneesInfo = parseInt(
-        extract_col.substring(
-          extract_col.indexOf("[") + 1,
-          extract_col.indexOf("]")
-        )
-      );
-      selectedAssignee = parseInt(
-        extract_col.substring(
-          extract_col.lastIndexOf("[") + 1,
-          extract_col.lastIndexOf("]")
-        )
-      );
-      if (!tableID[taskAssigneesInfo]) {
-        tableID[taskAssigneesInfo] = [];
-      }
-      tableID[taskAssigneesInfo].push(selectedAssignee);
-    } else {
-      tableID[taskAssigneesInfo].pop(selectedAssignee);
-    }
-  });
-
   var pos;
   //".on" function delegate previous DOM objects to its current modified version (can't use .click)
   jq$(".content-list").on("click", ".flex-list-items", function (e) {
@@ -224,40 +181,96 @@
     }
   });
 
+  jq$('#allRows[name="title"]').change(function () {
+    if (jq$(this).is(":checked")) {
+      jq$(this)
+        .closest("tr")
+        .siblings()
+        .find('[name="event"]')
+        .prop("checked", true);
+    } else {
+      jq$(this)
+        .closest("tr")
+        .siblings()
+        .find('[name="event"]')
+        .prop("checked", false);
+    }
+  });
+
+  function getCheckedEvents() {
+
+    var tableName = null;
+    var extract_col = null;
+    var tableID = [];
+    var taskAssigneesInfo;
+    var selectedAssignee;
+    var checkboxSelector = jq$('.goldTableCell [name="event"]:checked')
+    jq$.each(checkboxSelector, function () {
+      //Get ID of checked tables
+      tableName = jq$(this).closest("table.fullWidthTable tr");
+      extract_col = jq$(tableName)
+        .find(".goldTableCell:eq(4) .smallMarginWrapper select")
+        .attr("name");
+      taskAssigneesInfo = parseInt(
+        extract_col.substring(
+          extract_col.indexOf("[") + 1,
+          extract_col.indexOf("]")
+        )
+      );
+      selectedAssignee = parseInt(
+        extract_col.substring(
+          extract_col.lastIndexOf("[") + 1,
+          extract_col.lastIndexOf("]")
+        )
+      );
+      if (!tableID[taskAssigneesInfo]) {
+        tableID[taskAssigneesInfo] = [];
+      }
+
+      tableID[taskAssigneesInfo].push(selectedAssignee);
+    });
+    return tableID
+  }
+
+
   jq$("#applySubmit").click(function () {
+    var checkedEvents = getCheckedEvents()
+
+    console.log(checkedEvents)
+
+
     jq$("#loadDisplay").show();
     jq$("#main-area-body").hide();
-    jq$("#processes").text();
 
-    if (status[0] == true) {
-      var finalized_name = mapFromElement(jq$(".list-assigned"));
-      setTimeout(
-        postAssignee(finalized_name, tableID, selected_office, selected_cu),
-        5
-      );
-    } else if (status[1] == true) {
-      var event = [];
-      jq$(".selectedEventItem").each(function (index) {
-        event[index] = jq$(this).val();
-      });
 
-      var overseer_id = jq$("#selectedName").val();
-      setTimeout(
-        postOverseer(overseer_id, event, selected_office, selected_cu),
-        5
-      );
-    }
-    window.location.reload();
+      if (status[0] == true) {
+        var finalized_name = mapFromElement(jq$(".list-assigned"));
+        postAssignee(finalized_name, checkedEvents, selected_office, selected_cu)
+
+      } else if (status[1] == true) {
+        var overseerEvents = [];
+        jq$(".selectedEventItem").each(function (index) {
+          overseerEvents[index] = jq$(this).val();
+        });
+
+        var overseer_id = jq$("#selectedName").val();
+        postOverseer(overseer_id, overseerEvents, selected_office, selected_cu)
+
+      }
+      //window.location.reload();
+
+
+
   });
 
   /*********Functions**********/
-  function postAssignee(nameList, eventID, program_office, costing_unit) {
+  function postAssignee(nameList, events, program_office, costing_unit) {
     if (isNaN(costing_unit)) {
       costing_unit = "";
     }
 
     //Static data
-    var postData = {
+    var addData = {
       method: "addTaskAssignee",
       programOfficeId: program_office,
       displayPage: false,
@@ -280,29 +293,37 @@
     var eventIndex;
     var requestNo = 0;
     var total = 0;
-    jq$.each(tableID, function (index) {
-      total += tableID[index].length;
+    jq$.each(events, function (index, value) {
+      if (events[index] != undefined) {
+        total += events[index].length;
+      }
+
     });
     total *= Object.keys(nameList).length;
 
     jq$.each(nameList, function (name, id) {
-      for (var key = 0; key < eventID.length; key++) {
-        postData["processIndex"] = key;
-        for (var value = 0; value < eventID[key].length; value++) {
-          eventIndex = eventID[key][value];
-          postData["taskIndex"] = eventIndex;
-          postData["taskAssigneeId"] = id;
-          postData[
+      for (var key = 0; key < events.length; key++) {
+        if (events[key] == undefined) {
+          continue;
+        }
+        addData["processIndex"] = key;
+        for (var value = 0; value < events[key].length; value++) {
+          eventIndex = events[key][value];
+          addData["taskIndex"] = eventIndex;
+          addData["taskAssigneeId"] = id;
+          addData[
             "taskAssigneesInfo[" +
-              key +
-              "].selectedAssignee[" +
-              eventIndex +
-              "]"
+            key +
+            "].selectedAssignee[" +
+            eventIndex +
+            "]"
           ] = id;
+
 
           jq$.ajax({
             type: "POST",
-            data: postData,
+            async: true,
+            data: addData,
             url:
               "https://" +
               (d1$.isEmpty(d1$.hostname)
@@ -318,35 +339,40 @@
             },
             error: function (msg) {
               if (debugging) console.log("Update FAILED: " + msg);
+              console.log("Failed POST request " + requestNo++)
             },
           });
         }
       }
     });
 
-    //Save data after adding users
-    jq$.ajax({
-      type: "POST",
-      async: false,
-      data: saveData,
-      url:
-        "https://" +
-        (d1$.isEmpty(d1$.hostname) ? window.location.hostname : d1$.hostname) +
-        "/srs/sysadmin/system/programOfficeTaskSetup.do?",
+  //Save data after adding users
+  jq$.ajax({
+    type: "POST",
+    async: false,
+    data: saveData,
+    url:
+      "https://" +
+      (d1$.isEmpty(d1$.hostname) ? window.location.hostname : d1$.hostname) +
+      "/srs/sysadmin/system/programOfficeTaskSetup.do?",
 
-      success: function (data) {
-        if (debugging) console.log("Data: " + data);
-        jq$("#processes").text(
-          "Submitted POST request " + requestNo++ + " of total " + total
-        );
-      },
-      error: function (msg) {
-        if (debugging) console.log("Update FAILED: " + msg);
-      },
-    });
+    success: function (data) {
+      if (debugging) console.log("Data: " + data);
+      jq$("#processes").text(
+        "Submitted POST request " + requestNo++ + " of total " + total
+      );
+    },
+    error: function (msg) {
+      if (debugging) console.log("Update FAILED: " + msg);
+    },
+  });
+
+
+
+
   }
 
-  function postOverseer(overseer_id, eventID, program_office, costing_unit) {
+  function postOverseer(overseer_id, events, program_office, costing_unit) {
     if (isNaN(costing_unit)) {
       costing_unit = "";
     }
@@ -364,12 +390,12 @@
     };
 
     //Only 1 name for process overseer
-    for (var key = 0; key < eventID.length; key++) {
+    for (var key = 0; key < events.length; key++) {
       postData["processOverseer[" + key + "]"] = overseer_id;
     }
     jq$.ajax({
       type: "POST",
-      async: false,
+      async: true,
       data: postData,
       url:
         "https://" +
@@ -379,7 +405,7 @@
       success: function (data) {
         if (debugging) console.log("Data: " + data);
         jq$("#processes").text(
-          "Submitted POST request " + 1 + " of total " + eventID.length
+          "Submitted POST request " + 1 + " of total " + 1
         );
       },
       error: function (msg) {

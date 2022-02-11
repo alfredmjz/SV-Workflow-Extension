@@ -7,8 +7,12 @@
   display: block;
   margin-left: 30px;
   text-align: left;
-  position: relative;
   white-space: nowrap;
+  text-align: left;
+  position: fixed;
+  white-space:nowrap;
+  top: 50px;
+  right: 30px;
 }
 
 #flexbox {
@@ -21,6 +25,7 @@
   margin: 0;
   padding: 0;
   min-width: 400px;
+  background: white;
 }
 
 .user-flexchild,
@@ -65,7 +70,6 @@
 #button-wrapper {
   height: 100%;
   text-align: center;
-  margin-top: 10px;
 }
 
 #applyAssign {
