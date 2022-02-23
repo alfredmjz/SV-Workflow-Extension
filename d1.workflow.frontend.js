@@ -219,8 +219,10 @@
   jq$("#util_hidder").click(function () {
     if (jq$("#flexcontainer").children().css("visibility") === "visible") {
       jq$("#flexcontainer").children().css("visibility", "hidden");
+      jq$(this).html("Show");
     } else {
       jq$("#flexcontainer").children().css("visibility", "visible");
+      jq$(this).html("Hide");
     }
   });
 
