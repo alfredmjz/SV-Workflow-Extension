@@ -38,6 +38,13 @@
   min-width: 200px;
 }
 
+#hide-container {
+  display: block;
+  top: 42px;
+  right: 30px;
+  position:fixed;
+}
+
 .assigned-flexchild {
   border-left: solid 1px black;
 }
@@ -145,7 +152,7 @@ input[type="checkbox"][name="event"] {
   position: absolute;
   left: 38%;
   border: 16px solid #f3f3f3; /* Light grey */
-  border-top: 16px solid #3498db; /* Blue */
+  border-top: 16px solid #335176; /* Blue */
   border-radius: 50%;
   width: 120px;
   height: 120px;
@@ -168,4 +175,74 @@ input[type="checkbox"][name="event"] {
   100% {
     transform: rotate(360deg);
   }
+}
+
+.toggleText{
+  display:inline-block;
+  position: relative;
+  left: 10px;
+  margin: 0 1rem;
+  font-weight: 700;
+}
+
+.switch-wrapper {
+  position: relative;
+  display: inline-block;
+  width: 2.5rem;
+  height: 1.2rem;
+  left:10px;
+  margin-bottom: 5px;
+}
+
+.switch-wrapper #optionToggle {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+.toggle-slider:before {
+  position: absolute;
+  content: "";
+  height: 0.9rem;
+  width: 0.9rem;
+  left: 4px;
+  bottom: 2.7px;
+  background-color: white;
+  -webkit-transition: .4s;
+  transition: .4s;
+}
+
+#optionToggle:checked + .toggle-slider {
+  background-color: #335176;
+}
+
+#optionToggle:focus + .toggle-slider {
+  box-shadow: 0 0 1px #335176;
+}
+
+#optionToggle:checked + .toggle-slider:before {
+  -webkit-transform: translateX(26px);
+  -ms-transform: translateX(26px);
+  transform: translateX(1.2rem);
+}
+
+/* Rounded sliders */
+.toggle-slider {
+  border-radius: 6rem;
+}
+
+.toggle-slider:before {
+  border-radius: 50%;
 }
