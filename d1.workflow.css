@@ -3,6 +3,7 @@
 .alignBar {
   vertical-align: text-top;
 }
+
 #flexcontainer {
   display: block;
   margin-left: 30px;
@@ -159,23 +160,15 @@ input[type="checkbox"][name="event"] {
   animation: spin 2s linear infinite;
 }
 
-#processes {
+/* Not used */
+/* #processes {
   font-size: 1.2rem;
   width: 100%;
   position: absolute;
   display: inline-block;
   left: 0%;
   top: 80%;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
+} */
 
 .toggleText{
   display:inline-block;
@@ -245,4 +238,13 @@ input[type="checkbox"][name="event"] {
 
 .toggle-slider:before {
   border-radius: 50%;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }

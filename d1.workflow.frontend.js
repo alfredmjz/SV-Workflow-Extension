@@ -217,11 +217,11 @@
   });
 
   jq$("#util_hidder").click(function () {
-    if (jq$("#flexcontainer").children().css("visibility") === "visible") {
-      jq$("#flexcontainer").children().css("visibility", "hidden");
+    if (jq$("#flexcontainer").css("display") === "block") {
+      jq$("#flexcontainer").css("display", "none");
       jq$(this).html("Show");
-    } else {
-      jq$("#flexcontainer").children().css("visibility", "visible");
+    } else if(jq$("#flexcontainer").css("display") === "none"){
+      jq$("#flexcontainer").css("display", "block");
       jq$(this).html("Hide");
     }
   });
