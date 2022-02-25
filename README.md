@@ -20,7 +20,7 @@ A bulk control system which allows users to select multiple assignees to multipl
   - Checkboxes on each event
   - A Scroll Up button which automatically brings user to the top of the page when clicked
 
-# UPDATED: Version 1.1:
+# UPDATED: Version 1.1
   - Added Workflow Owner assignment
   - Added toggle button to switch between Assignee assignment and Workflow Owner assignment
   - Updates functionality for Workflow Owner assignment
