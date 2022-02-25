@@ -226,40 +226,6 @@
     }
   });
 
-  function getCheckedEvents() {
-    var tableName = null;
-    var extract_col = null;
-    var tableID = [];
-    var taskAssigneesInfo;
-    var selectedAssignee;
-    var checkboxSelector = jq$('.goldTableCell [name="event"]:checked');
-    jq$.each(checkboxSelector, function () {
-      //Get ID of checked tables
-      tableName = jq$(this).closest("table.fullWidthTable tr");
-      extract_col = jq$(tableName)
-        .find(".goldTableCell:eq(4) .smallMarginWrapper select")
-        .attr("name");
-      taskAssigneesInfo = parseInt(
-        extract_col.substring(
-          extract_col.indexOf("[") + 1,
-          extract_col.indexOf("]")
-        )
-      );
-      selectedAssignee = parseInt(
-        extract_col.substring(
-          extract_col.lastIndexOf("[") + 1,
-          extract_col.lastIndexOf("]")
-        )
-      );
-      if (!tableID[taskAssigneesInfo]) {
-        tableID[taskAssigneesInfo] = [];
-      }
-
-      tableID[taskAssigneesInfo].push(selectedAssignee);
-    });
-    return tableID;
-  }
-
   jq$("#applySubmit").click(function () {
     var checkedEvents = getCheckedEvents();
     jq$("#loadDisplay").show();
@@ -296,14 +262,52 @@
     location.reload(true);
   });
 
-  /*********Functions**********/
-  function postAssignee(
-    nameList,
-    events,
-    program_office,
-    costing_unit,
-    requestTotal
-  ) {
+  /*********Util functions**********/
+  /* Reads the table id and its' row id of only checked checkboxes */
+  function getCheckedEvents() {
+    var tableName = null;
+    var extract_col = null;
+    var tableID = [];
+    var taskAssigneesInfo;
+    var selectedAssignee;
+    var checkboxSelector = jq$('.goldTableCell [name="event"]:checked');
+    jq$.each(checkboxSelector, function () {
+      //Get ID of checked tables
+      tableName = jq$(this).closest("table.fullWidthTable tr");
+
+      //Select the targeted row
+      extract_col = jq$(tableName)
+        .find(".goldTableCell:eq(4) .smallMarginWrapper select")
+        .attr("name");
+
+      //Retrieve table ID
+      taskAssigneesInfo = parseInt(
+        extract_col.substring(
+          extract_col.indexOf("[") + 1,
+          extract_col.indexOf("]")
+        )
+      );
+
+      //Retrieve row ID
+      selectedAssignee = parseInt(
+        extract_col.substring(
+          extract_col.lastIndexOf("[") + 1,
+          extract_col.lastIndexOf("]")
+        )
+      );
+
+      //Push array of selected ID into a list where its keys represents the table ID
+      if (!tableID[taskAssigneesInfo]) {
+        tableID[taskAssigneesInfo] = [];
+      }
+
+      tableID[taskAssigneesInfo].push(selectedAssignee);
+    });
+    return tableID;
+  }
+
+  /* Gather and organize selected data to make a POST request */
+  function postAssignee( nameList, events, program_office, costing_unit, requestTotal) {
     if (isNaN(costing_unit)) {
       costing_unit = "";
     }
@@ -325,7 +329,6 @@
     };
 
     //Dynamic data
-    //TODO: Ensure names are updated on existing assignee, async must be set to true
     jq$.each(nameList, function (name, id) {
       for (var key = 0; key < events.length; key++) {
         if (events[key] == undefined) {
@@ -351,6 +354,7 @@
     ajaxCallAssignee(saveData, currentReq, requestTotal);
   }
 
+  /* Calls asynchronous POST requests to update Assigned User */
   function ajaxCallAssignee(data, current_req, total_req) {
     return jq$.ajax({
       type: "POST",
@@ -376,6 +380,7 @@
     });
   }
 
+  /* Calls asynchronous POST request to update Workflow Owner */
   function postOverseer(overseer_id, events, program_office, costing_unit) {
     if (isNaN(costing_unit)) {
       costing_unit = "";
@@ -424,8 +429,10 @@
     });
   }
 
-  //default = push all names to left of table
-  //assign = push all names to right of table
+  /*Generate dynamic name list based on existing Assignee or Workflow Owner list
+    mode :  default = push all names to left of table
+            assign = push all names to right of table
+    Workflow Owner does not have "assign" mode, names are always on the left */
   function addNameList(mode, nameList) {
     if (mode == "default" && nameList == names.assignee) {
       jq$.each(nameList, function (name, id) {
@@ -471,7 +478,7 @@
     }
   }
 
-  //Find index of keys from dictionary
+  /* Find index of keys from existing dictionary */
   function findPos(dict, target) {
     var index = 1;
     for (var name in dict) {
@@ -483,7 +490,7 @@
     return index;
   }
 
-  //Extract names from dropdown box
+  /* Extract Assignee names from dropdown box unique to each program office and costing unit*/
   function mapAssignee(program_office, costing_unit) {
     var assignee_selector = null;
     var wf_owner_selector = null;
@@ -533,7 +540,7 @@
     return { assignee: assignee, wf_owner: wf_owner };
   }
 
-  //Convert text and value to a list
+  /* Convert text and value to a list of objects*/
   function mapFromElement(HTML_selector) {
     var result = {};
 
