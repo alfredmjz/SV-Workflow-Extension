@@ -160,15 +160,14 @@ input[type="checkbox"][name="event"] {
   animation: spin 2s linear infinite;
 }
 
-/* Not used */
-/* #processes {
+#processes {
   font-size: 1.2rem;
   width: 100%;
   position: absolute;
   display: inline-block;
   left: 0%;
   top: 80%;
-} */
+}
 
 .toggleText{
   display:inline-block;

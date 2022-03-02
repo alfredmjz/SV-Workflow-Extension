@@ -108,37 +108,26 @@
   var pos;
   //".on" function delegate previous DOM objects to its current modified version (can't use .click)
   jq$(".content-list").on("click", ".flex-list-items", function (e) {
-    //Move selected user to right of table
     pos = findPos(names.assignee, jq$(this).text());
-    ``;
 
-    if (
-      jq$("#optionToggle").val() == "assignee" &&
-      jq$(this).is(".list-user")
-    ) {
+    //Move selected user to right of table
+    if ( jq$("#optionToggle").val() == "assignee" && jq$(this).is(".list-user")) {
       jq$(this).replaceWith("<li class='flex-list-items list-user'></li>");
       jq$("#assigned-list > li:eq(" + pos + ")").replaceWith(this);
       jq$(this).addClass("list-assigned").removeClass("list-user");
     }
 
     //Move selected user to left of table
-    else if (
-      jq$("#optionToggle").val() == "assignee" &&
-      jq$(this).is(".list-assigned")
-    ) {
+    else if ( jq$("#optionToggle").val() == "assignee" && jq$(this).is(".list-assigned")) {
       jq$(this).replaceWith("<li class='flex-list-items list-assigned'></li>");
       jq$("#user-list > li:eq(" + pos + ")").replaceWith(this);
       jq$(this).addClass("list-user").removeClass("list-assigned");
-    } else if (
-      jq$("#optionToggle").val() == "overseer" &&
-      jq$(this).is(".list-user")
-    ) {
+    }
+    else if (jq$("#optionToggle").val() == "overseer" && jq$(this).is(".list-user")) {
       jq$(this).siblings().removeAttr("id");
       jq$(this).attr("id", "selectedName");
-    } else if (
-      jq$("#optionToggle").val() == "overseer" &&
-      jq$(this).is(".list-assigned")
-    ) {
+    }
+    else if (jq$("#optionToggle").val() == "overseer" &&jq$(this).is(".list-assigned")) {
       if (jq$(this).is(".selectedEventItem")) {
         jq$(this).removeClass("selectedEventItem");
         return;
@@ -166,6 +155,8 @@
     if (jq$(this).val() == "overseer") {
       jq$("#user-list .flex-first-row").text("Name");
       jq$("#assigned-list .flex-first-row").text("Assignee");
+      jq$("#moveAllLeft").text("<<");
+      jq$("#moveAllRight").text(">>");
       jq$(this).val("assignee");
 
       addNameList("default", names.assignee);
@@ -240,7 +231,8 @@
           total += checkedEvents[index].length;
         }
       });
-      total *= Object.keys(finalized_name).length;
+
+      total *= ((Object.keys(finalized_name).length)) + 1;
 
       postAssignee(
         finalized_name,
@@ -314,7 +306,7 @@
 
     //Static data
     var eventIndex = 0;
-    var currentReq = 0;
+    var currentReq = 1;
     var addData = {
       method: "addTaskAssignee",
       programOfficeId: program_office,
@@ -390,7 +382,7 @@
     var postData = {
       method: "update",
       programOfficeId: program_office,
-      displayPage: false,
+      displayPage: true,
       costingUnitId: costing_unit,
       processIndex: 0,
       taskIndex: 0,
