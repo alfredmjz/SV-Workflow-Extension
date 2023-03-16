@@ -1,9 +1,9 @@
 {
-  "manifest_version": 2,
+  "manifest_version": 3,
   "name": "SV Functions (D1)",
   "short_name": "SVF",
   "version": "0.89",
-   "browser_action": {
+   "action": {
    },
   "icons": {
    "16": "cloud_add_16.png",
@@ -135,6 +135,10 @@
       "css": ["d1.workflow.css"],
       "js": ["d1.workflow.frontend.js"]
     }
+
   ],
-  "web_accessible_resources": ["d1.common.css","bootstrapiso.min.css"]
+  "web_accessible_resources": [{
+    "resources": ["d1.common.css","bootstrapiso.min.css"],
+    "matches": ["https://*/*"]
+    }]
 }

@@ -111,23 +111,33 @@
     pos = findPos(names.assignee, jq$(this).text());
 
     //Move selected user to right of table
-    if ( jq$("#optionToggle").val() == "assignee" && jq$(this).is(".list-user")) {
+    if (
+      jq$("#optionToggle").val() == "assignee" &&
+      jq$(this).is(".list-user")
+    ) {
       jq$(this).replaceWith("<li class='flex-list-items list-user'></li>");
       jq$("#assigned-list > li:eq(" + pos + ")").replaceWith(this);
       jq$(this).addClass("list-assigned").removeClass("list-user");
     }
 
     //Move selected user to left of table
-    else if ( jq$("#optionToggle").val() == "assignee" && jq$(this).is(".list-assigned")) {
+    else if (
+      jq$("#optionToggle").val() == "assignee" &&
+      jq$(this).is(".list-assigned")
+    ) {
       jq$(this).replaceWith("<li class='flex-list-items list-assigned'></li>");
       jq$("#user-list > li:eq(" + pos + ")").replaceWith(this);
       jq$(this).addClass("list-user").removeClass("list-assigned");
-    }
-    else if (jq$("#optionToggle").val() == "overseer" && jq$(this).is(".list-user")) {
+    } else if (
+      jq$("#optionToggle").val() == "overseer" &&
+      jq$(this).is(".list-user")
+    ) {
       jq$(this).siblings().removeAttr("id");
       jq$(this).attr("id", "selectedName");
-    }
-    else if (jq$("#optionToggle").val() == "overseer" &&jq$(this).is(".list-assigned")) {
+    } else if (
+      jq$("#optionToggle").val() == "overseer" &&
+      jq$(this).is(".list-assigned")
+    ) {
       if (jq$(this).is(".selectedEventItem")) {
         jq$(this).removeClass("selectedEventItem");
         return;
@@ -211,7 +221,7 @@
     if (jq$("#flexcontainer").css("display") === "block") {
       jq$("#flexcontainer").css("display", "none");
       jq$(this).html("Show");
-    } else if(jq$("#flexcontainer").css("display") === "none"){
+    } else if (jq$("#flexcontainer").css("display") === "none") {
       jq$("#flexcontainer").css("display", "block");
       jq$(this).html("Hide");
     }
@@ -232,7 +242,7 @@
         }
       });
 
-      total *= ((Object.keys(finalized_name).length)) + 1;
+      total *= Object.keys(finalized_name).length + 1;
 
       postAssignee(
         finalized_name,
@@ -299,7 +309,13 @@
   }
 
   /* Gather and organize selected data to make a POST request */
-  function postAssignee( nameList, events, program_office, costing_unit, requestTotal) {
+  function postAssignee(
+    nameList,
+    events,
+    program_office,
+    costing_unit,
+    requestTotal
+  ) {
     if (isNaN(costing_unit)) {
       costing_unit = "";
     }
@@ -531,7 +547,7 @@
 
     return { assignee: assignee, wf_owner: wf_owner };
   }
-
+  q;
   /* Convert text and value to a list of objects*/
   function mapFromElement(HTML_selector) {
     var result = {};
